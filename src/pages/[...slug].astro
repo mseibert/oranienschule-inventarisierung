@@ -1,0 +1,121 @@
+---
+import Welcome from '../components/Welcome.astro';
+import Layout from '../layouts/Layout.astro';
+
+
+interface SeatableMetadata {
+  app_name: string;
+  access_token: string;
+  dtable_uuid: string;
+  dtable_server: string;
+  dtable_socket: string;
+  dtable_db: string;
+  workspace_id: number;
+  dtable_name: string;
+  use_api_gateway: boolean;
+}
+
+export interface inventarTeil {
+  results: Array<{
+    Name: string;
+    Bezeichnung: string;
+    Kategorie: string;
+    'Hersteller/Marke/Autor/Komponist': string;
+    Modell: string;
+    Seriennummer: string;
+    Anschaffungsdatum: string | null;
+    Anschaffungskosten: number;
+    Bild: string | null;
+    Zustand: string | null;
+    'Letzte Wartung': string | null;
+    Verleihstatus: string;
+    Verantwortlich: string;
+    Bemerkungen: string;
+    'QR-Code': string | null;
+    _locked: null;
+    _locked_by: null;
+    _archived: boolean;
+    _creator: string;
+    _ctime: string;
+    _last_modifier: string;
+    _mtime: string;
+    _id: string;
+  }>;
+}
+
+export async function getStaticPaths() {
+  const token = import.meta.env.SEATABLE_API_TOKEN;
+  const url = 'https://cloud.seatable.io/api/v2.1/dtable/app-access-token/';
+  const options = {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      authorization: `Bearer ${token}`
+    }
+  };
+
+  const seatableMetadata = await fetch(url, options)
+    .then(res => res.json())
+    .then(json => json as SeatableMetadata)
+    .catch(err => console.error(err));
+
+  const url2 = 'https://cloud.seatable.io/api-gateway/api/v2/dtables/179b6774-6a37-4726-a630-7b09baf8f138/sql';
+  const options2 = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      authorization: `Bearer ${seatableMetadata?.access_token}`
+    },
+    body: JSON.stringify({sql: 'SELECT * FROM Inventarliste LIMIT 3', convert_keys: true})
+  };
+
+  const data2 = await fetch(url2, options2)
+    .then(res => res.json())
+    .then(json => json)  
+    .catch(err => console.error(err)) as unknown as inventarTeil;
+
+  type Page = {
+    slug: string | undefined;
+    title: string;
+    text: string;
+    item?: inventarTeil['results'][0];
+  };
+
+  const pages: Page[] = [
+    {
+      slug: undefined,
+      title: "Astro Store",
+      text: "Welcome to the Astro store!",
+    },
+    {
+      slug: "products",
+      title: "Astro products",
+      text: "We have lots of products for you",
+    },
+    {
+      slug: "products/astro-handbook",
+      title: "The ultimate Astro handbook",
+      text: "If you want to learn Astro, you must read this book.",
+    },
+    ...data2.results.map(item => ({
+      slug: `products/${item._id}`,
+      title: item.Name,
+      text: item.Bezeichnung,
+      item: item
+    }))
+  ];
+
+  return pages.map(({ slug, title, text, item }) => {
+    return {
+      params: { slug },
+      props: { title, text, item },
+    };
+  });
+}
+
+const { title, text, item } = Astro.props;
+---
+<Layout>
+	<Welcome item={item} />
+</Layout>
