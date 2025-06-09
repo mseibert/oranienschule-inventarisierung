@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Welcome from '../components/Welcome.astro';
+import { getStaticPaths } from '../pages/[...slug].astro';
+const allPages = await getStaticPaths();
+
+const pages = allPages.map(({ params, props }) => ({
+  slug: params.slug,
+  title: props.title,
+  text: props.text
+}));
+
+---
+<Layout>
+	<div class="links">
+		{allPages.map(({ params, props }) => (
+		  <div class="link-item">
+			<a href={params.slug ? `/${params.slug}` : '/'}>{props.title}</a>
+		  </div>
+		))}
+	  </div>	
+</Layout>
+  
+  <style>
+	.links {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 1rem;
+	  padding: 1rem;
+	}
+  
+	.link-item {
+	  padding: 0.5rem;
+	  border: 1px solid #e5e7eb;
+	  border-radius: 0.375rem;
+	  transition: all 0.2s;
+	}
+  
+	.link-item:hover {
+	  background-color: #f3f4f6;
+	  transform: translateX(0.5rem);
+	}
+  
+	.link-item a {
+	  text-decoration: none;
+	  color: #374151;
+	}
+  </style>
+  

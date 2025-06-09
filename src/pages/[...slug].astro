@@ -83,21 +83,6 @@ export async function getStaticPaths() {
   };
 
   const pages: Page[] = [
-    {
-      slug: undefined,
-      title: "Astro Store",
-      text: "Welcome to the Astro store!",
-    },
-    {
-      slug: "products",
-      title: "Astro products",
-      text: "We have lots of products for you",
-    },
-    {
-      slug: "products/astro-handbook",
-      title: "The ultimate Astro handbook",
-      text: "If you want to learn Astro, you must read this book.",
-    },
     ...data2.results.map(item => ({
       slug: `products/${item._id}`,
       title: item.Name,
@@ -114,8 +99,43 @@ export async function getStaticPaths() {
   });
 }
 
+const allPages = await getStaticPaths();
+
 const { title, text, item } = Astro.props;
 ---
 <Layout>
 	<Welcome item={item} />
 </Layout>
+<div class="links">
+  {allPages.map(({ params, props }) => (
+    <div class="link-item">
+      <a href={params.slug ? `/${params.slug}` : '/'}>{props.title}</a>
+    </div>
+  ))}
+</div>
+
+<style>
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .link-item {
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+  }
+
+  .link-item:hover {
+    background-color: #f3f4f6;
+    transform: translateX(0.5rem);
+  }
+
+  .link-item a {
+    text-decoration: none;
+    color: #374151;
+  }
+</style>
