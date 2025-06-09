@@ -1,7 +1,8 @@
 ---
-import Welcome from '../components/Welcome.astro';
+import Inventar from '../components/Inventar.astro';
+import InventarList from '../components/InventarList.astro';
 import Layout from '../layouts/Layout.astro';
-
+import { getSeatableMetadata, getInventarListWithImages } from '../lib/seatable';
 
 interface SeatableMetadata {
   app_name: string;
@@ -26,6 +27,7 @@ export interface inventarTeil {
     Anschaffungsdatum: string | null;
     Anschaffungskosten: number;
     Bild: string | null;
+    Bilddownload: string[] | null;
     Zustand: string | null;
     'Letzte Wartung': string | null;
     Verleihstatus: string;
@@ -45,45 +47,18 @@ export interface inventarTeil {
 
 export async function getStaticPaths() {
   const token = import.meta.env.SEATABLE_API_TOKEN;
-  const url = 'https://cloud.seatable.io/api/v2.1/dtable/app-access-token/';
-  const options = {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      authorization: `Bearer ${token}`
-    }
-  };
-
-  const seatableMetadata = await fetch(url, options)
-    .then(res => res.json())
-    .then(json => json as SeatableMetadata)
-    .catch(err => console.error(err));
-
-  const url2 = 'https://cloud.seatable.io/api-gateway/api/v2/dtables/179b6774-6a37-4726-a630-7b09baf8f138/sql';
-  const options2 = {
-    method: 'POST',
-    headers: {
-      accept: 'application/json',
-      'content-type': 'application/json',
-      authorization: `Bearer ${seatableMetadata?.access_token}`
-    },
-    body: JSON.stringify({sql: 'SELECT * FROM Inventarliste LIMIT 3', convert_keys: true})
-  };
-
-  const data2 = await fetch(url2, options2)
-    .then(res => res.json())
-    .then(json => json)  
-    .catch(err => console.error(err)) as unknown as inventarTeil;
+  const seatableMetadata = await getSeatableMetadata(token);
+  const inventarList = await getInventarListWithImages(seatableMetadata);
 
   type Page = {
     slug: string | undefined;
     title: string;
     text: string;
-    item?: inventarTeil['results'][0];
+    item?: any;
   };
 
   const pages: Page[] = [
-    ...data2.results.map(item => ({
+    ...inventarList.results.map(item => ({
       slug: `products/${item._id}`,
       title: item.Name,
       text: item.Bezeichnung,
@@ -100,19 +75,12 @@ export async function getStaticPaths() {
 }
 
 const allPages = await getStaticPaths();
-
 const { title, text, item } = Astro.props;
 ---
 <Layout>
-	<Welcome item={item} />
+	<Inventar item={item} />
+	<InventarList pages={allPages} />
 </Layout>
-<div class="links">
-  {allPages.map(({ params, props }) => (
-    <div class="link-item">
-      <a href={params.slug ? `/${params.slug}` : '/'}>{props.title}</a>
-    </div>
-  ))}
-</div>
 
 <style>
   .links {

@@ -3,7 +3,7 @@ import astroLogo from '../assets/astro.svg';
 import background from '../assets/background.svg';
 import type { inventarTeil } from '../pages/[...slug].astro';
 const { item } = Astro.props as { item?: inventarTeil['results'][0] };
-
+// console.log('item', item?.Bilddownload);
 ---
 
 <div id="container">
@@ -24,6 +24,18 @@ const { item } = Astro.props as { item?: inventarTeil['results'][0] };
 				<tr>
 					<th>Name</th>
 					<td>{item?.Name}</td>
+				</tr>
+				<tr>
+					<th>Bild</th>
+					<td>
+						{item?.Bilddownload && item.Bilddownload.map((image, index) => (
+							<img 
+								src={image} 
+								alt={`Bild ${index + 1} von ${item.Name}`} 
+								style="max-width: 100px; max-height: 100px; object-fit: contain; margin: 0.5rem;" 
+							/>
+						))}
+					</td>
 				</tr>
 				<tr>
 					<th>Kategorie</th>
