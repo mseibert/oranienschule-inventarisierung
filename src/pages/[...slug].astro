@@ -78,8 +78,8 @@ const allPages = await getStaticPaths();
 const { title, text, item } = Astro.props;
 ---
 <Layout>
-	<Inventar item={item} />
 	<InventarList pages={allPages} />
+	<Inventar item={item} />
 </Layout>
 
 <style>

@@ -24,7 +24,7 @@ export async function getInventarList(metadata: SeatableMetadata): Promise<Inven
       'content-type': 'application/json',
       authorization: `Bearer ${metadata.access_token}`
     },
-    body: JSON.stringify({sql: 'SELECT * FROM Inventarliste LIMIT 2', convert_keys: true})
+    body: JSON.stringify({sql: 'SELECT * FROM Inventarliste LIMIT 3', convert_keys: true})
   };
 
   const response = await fetch(url, options);
@@ -105,7 +105,7 @@ interface SeatableMetadata {
       Seriennummer: string;
       Anschaffungsdatum: string | null;
       Anschaffungskosten: number;
-      Bild: string | null;
+      Bild: string[] | null;
       Bilddownload: string[] | null;
       Zustand: string | null;
       'Letzte Wartung': string | null;
