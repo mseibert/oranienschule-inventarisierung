@@ -31,14 +31,23 @@ import { Image } from 'astro:assets';
 					<th>Bild</th>
 					<td>
 						{item?.Bilddownload && item.Bilddownload.map((image, index) => (
-							<a href={image} target="_blank" rel="noopener noreferrer">
+							<button popovertarget={`image-${index}`} class="image-button">
 								<Image 
 									src={image} 
 									inferSize={true}
 									alt={`Bild ${index + 1} von ${item.Name}`} 
 									style="max-width: 100px; max-height: 100px; object-fit: contain; margin: 0.5rem;" 
 								/>
-							</a>
+							</button>
+							<div popover id={`image-${index}`} class="image-popover">
+								<button popovertarget={`image-${index}`} popovertargetaction="hide" class="close-button">×</button>
+								<Image 
+									src={image} 
+									inferSize={true}
+									alt={`Bild ${index + 1} von ${item.Name}`} 
+									style="max-width: 80vw; max-height: 80vh; object-fit: contain;" 
+								/>
+							</div>
 						))}
 					</td>
 				</tr>
