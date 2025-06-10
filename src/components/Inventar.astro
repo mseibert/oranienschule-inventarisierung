@@ -31,12 +31,14 @@ import { Image } from 'astro:assets';
 					<th>Bild</th>
 					<td>
 						{item?.Bilddownload && item.Bilddownload.map((image, index) => (
-							<Image 
-								src={image} 
-								inferSize={true}
-								alt={`Bild ${index + 1} von ${item.Name}`} 
-								style="max-width: 100px; max-height: 100px; object-fit: contain; margin: 0.5rem;" 
-							/>
+							<a href={image} target="_blank" rel="noopener noreferrer">
+								<Image 
+									src={image} 
+									inferSize={true}
+									alt={`Bild ${index + 1} von ${item.Name}`} 
+									style="max-width: 100px; max-height: 100px; object-fit: contain; margin: 0.5rem;" 
+								/>
+							</a>
 						))}
 					</td>
 				</tr>
