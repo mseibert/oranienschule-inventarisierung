@@ -1,0 +1,122 @@
+---
+import Layout from '../layouts/Layout.astro';
+import background from '../assets/background.svg';
+import { getStaticPathsConfiguration } from '../lib/getStaticPathsConfiguration';
+const allPages = await getStaticPathsConfiguration();
+
+const pages = allPages.map(({ params, props }) => ({
+  slug: params.slug,
+  title: props.title,
+  text: props.text
+}));
+
+---
+<Layout>
+	<div class="container">
+		<img class="background" src={background.src} alt="" fetchpriority="high" />
+		<main class="content">
+			<section class="error-section">
+				<h1 class="error-title">404 - Seite nicht gefunden</h1>
+				<div class="error-content">
+					<p class="error-message">Die angeforderte Seite existiert nicht.</p>
+					<div class="error-info">
+						<p>Wenn Sie einen QR-Code gescannt haben und dann auf dieser Seite landen, ist das Inventar-Teil noch nicht erfasst. Sie können diesen QR-Code auf ein neues Inventar-Teil kleben und dann <a href="https://direkt.oranienschule.de/inventarisieren">hier die Inventarisierung durchführen</a>.</p>
+						<p>Voraussetzung für die Inventarisierung ist, dass Sie bereits einen Seatable-Account haben. Wenn Sie noch keinen haben, können Sie sich <a href="https://direkt.oranienschule.de/seatablekontoanlegen">hier registrieren</a>. Sie müssen danach noch freigeschaltet werden. Das können aktuell folgende Lehrkräfte erledigen: Juliane Seibert, Cathrin Weinig, Andrea Wettermann, Simon Wein.</p>
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+</Layout>
+
+<style>
+	.container {
+		position: relative;
+		min-height: 100vh;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+	}
+
+	.background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		z-index: -1;
+		opacity: 0.1;
+	}
+
+	.content {
+		width: 100%;
+		max-width: 800px;
+		padding: 2rem;
+	}
+
+	.error-section {
+		background: white;
+		border-radius: 1rem;
+		padding: 2rem;
+		box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+	}
+
+	.error-title {
+		font-size: 2.5rem;
+		color: #1f2937;
+		margin-bottom: 1.5rem;
+		text-align: center;
+	}
+
+	.error-content {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.error-message {
+		font-size: 1.25rem;
+		color: #4b5563;
+		text-align: center;
+		margin-bottom: 1rem;
+	}
+
+	.error-info {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.error-info p {
+		color: #4b5563;
+		line-height: 1.6;
+	}
+
+	a {
+		color: #2563eb;
+		text-decoration: underline;
+		transition: color 0.2s;
+	}
+
+	a:hover {
+		color: #1d4ed8;
+	}
+
+	@media (max-width: 640px) {
+		.content {
+			padding: 1rem;
+		}
+
+		.error-section {
+			padding: 1.5rem;
+		}
+
+		.error-title {
+			font-size: 2rem;
+		}
+	}
+</style>
+  
