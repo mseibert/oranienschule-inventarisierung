@@ -5,33 +5,20 @@ export const prerender = false; // Not needed in 'server' mode
 // import { isValidEmail } from "../utils/isValidEmail";
 import Layout from '../layouts/Layout.astro';
 
-const errors = { username: "", email: "", password: "" };
+const errors = { email: "" };
 if (Astro.request.method === "POST") {
   try {
     const data = await Astro.request.formData();
-    const name = data.get("username");
     const email = data.get("email");
-    const password = data.get("password");
-    if (typeof name !== "string" || name.length < 1) {
-      errors.username += "Please enter a username. ";
-    }
-    // if (typeof email !== "string" || !isValidEmail(email)) {
-	if (typeof email !== "string" || email.length < 1) {
+    if (typeof email !== "string" || email.length < 1) {
       errors.email += "Please enter an email. ";
-    }
-    if (typeof password !== "string" || password.length < 6) {
-      errors.password += "Password must be at least 6 characters. ";
     }
     const hasErrors = Object.values(errors).some(msg => msg)
     if (!hasErrors) {
       // await registerUser({name, email, password});
-      const usernameInput = document.querySelector('input[name=username]') as HTMLInputElement;
       const emailInput = document.querySelector('input[name=email]') as HTMLInputElement;
-      const passwordInput = document.querySelector('input[name=password]') as HTMLInputElement;
       console.log('Form submitted:', {
-        username: usernameInput?.value || '',
-        email: emailInput?.value || '',
-        password: passwordInput?.value || ''
+        email: emailInput?.value || ''
       });
     }
   } catch (error) {
@@ -47,18 +34,6 @@ if (Astro.request.method === "POST") {
   <form method="POST" class="space-y-6">
     <div class="space-y-2">
       <label class="block text-lg font-medium text-gray-700">
-        Username:
-        <input 
-          type="text" 
-          name="username" 
-          class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg p-3"
-        />
-      </label>
-      {errors.username && <p class="text-red-500 text-sm mt-1">{errors.username}</p>}
-    </div>
-
-    <div class="space-y-2">
-      <label class="block text-lg font-medium text-gray-700">
         Email:
         <input 
           type="email" 
@@ -68,20 +43,6 @@ if (Astro.request.method === "POST") {
         />
       </label>
       {errors.email && <p class="text-red-500 text-sm mt-1">{errors.email}</p>}
-    </div>
-
-    <div class="space-y-2">
-      <label class="block text-lg font-medium text-gray-700">
-        Password:
-        <input 
-          type="password" 
-          name="password" 
-          required 
-          minlength="6" 
-          class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg p-3"
-        />
-      </label>
-      {errors.password && <p class="text-red-500 text-sm mt-1">{errors.password}</p>}
     </div>
 
     <button 
@@ -97,24 +58,37 @@ if (Astro.request.method === "POST") {
 <script>
   document.getElementById('submitButton')?.addEventListener('click', async (e) => {
     e.preventDefault();
-    const usernameInput = document.querySelector('input[name=username]') as HTMLInputElement;
     const emailInput = document.querySelector('input[name=email]') as HTMLInputElement;
-    const passwordInput = document.querySelector('input[name=password]') as HTMLInputElement;
+    const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
     
     try {
-      await fetch('/api/register', {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending...';
+      
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: usernameInput?.value || '',
-          email: emailInput?.value || '',
-          password: passwordInput?.value || ''
+          email: emailInput?.value || ''
         })
       });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        alert('Registration successful!');
+        emailInput.value = '';
+      } else {
+        alert('Registration failed: ' + (result.error || 'Unknown error'));
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
+      alert('An error occurred while submitting the form. Please try again.');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Register';
     }
   });
 </script>
