@@ -71,12 +71,17 @@ export async function getStaticPaths() {
     }))
   ];
 
-  return pages.map(({ slug, title, text, item, teil }) => {
-    return {
+  return pages.flatMap(({ slug, title, text, item, teil }) => [
+    {
       params: { slug },
       props: { title, text, item, teil },
-    };
-  });
+    },
+    {
+      params: { slug: teil },
+      props: { title, text, item, teil },
+      redirect: `${slug}`
+    }
+  ]);
 }
 
 const allPages = await getStaticPaths();
