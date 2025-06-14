@@ -1,6 +1,6 @@
 ---
 import Header from '../components/Header.astro';
-
+import '../styles/global.css';
 ---
 
 <!doctype html>
@@ -12,9 +12,13 @@ import Header from '../components/Header.astro';
 		<meta name="generator" content={Astro.generator} />
 		<title>Inventar der Oranienschule, Wiesbaden</title>
 	</head>
-	<body>
-		<Header />
-		<slot />
+	<body class="min-h-screen bg-white">
+		<div class="container mx-auto px-4">
+			<Header />
+			<main class="py-8">
+				<slot />
+			</main>
+		</div>
 	</body>
 </html>
 
