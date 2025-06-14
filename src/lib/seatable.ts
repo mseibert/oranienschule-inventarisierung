@@ -36,12 +36,8 @@ export async function getImageDownloadLink(metadata: SeatableMetadata, images: A
     const cleanArray = images[0];
   if (!cleanArray) return [];
 
-    console.log('images', typeof cleanArray);
-    console.log('stringified', JSON.stringify(cleanArray));
     const downloadLinksArray = await Promise.all(cleanArray.map(async (image) => {
-    //   console.log('image', image);
       const decoded = decodeURI(image);
-    //   console.log('decoded', decoded);
       const imagePath = `/images/${decoded.split('/images/')[1]}`;
       const url = `https://cloud.seatable.io/api/v2.1/dtable/app-download-link/?path=${encodeURIComponent(imagePath)}`;
       const options = {
