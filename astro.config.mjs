@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import redirects from "./redirects.json";
 
 import vercel from '@astrojs/vercel';
 
@@ -9,5 +10,6 @@ export default defineConfig({
     image: {
         domains: ["cloud.seatable.io"],
       },
+      redirects,
     adapter: vercel()
 });

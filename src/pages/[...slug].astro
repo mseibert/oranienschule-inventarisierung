@@ -70,7 +70,6 @@ export async function getStaticPaths() {
       item: item
     }))
   ];
-  console.log(pages);
 
   return pages.map(({ slug, title, text, item, teil }) => {
     return {
