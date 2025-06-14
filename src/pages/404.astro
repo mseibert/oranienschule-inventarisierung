@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import background from '../assets/background.svg';
-import { getStaticPathsConfiguration } from '../lib/getStaticPathsConfiguration';
-const allPages = await getStaticPathsConfiguration();
+import { getStaticPaths } from '../pages/[...slug].astro';
+const allPages = await getStaticPaths();
 
 const pages = allPages.map(({ params, props }) => ({
   slug: params.slug,
