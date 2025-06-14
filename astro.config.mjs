@@ -9,7 +9,10 @@ export default defineConfig({
     output: 'static',
     image: {
         domains: ["cloud.seatable.io"],
-      },
-      redirects,
+    },
+    redirects: {
+        ...redirects,
+        "/teil855": "/POj_68efRG2gpt2R6dmDGA"
+    },
     adapter: vercel()
 });
