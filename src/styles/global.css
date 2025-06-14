@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+body {
+  @apply min-h-screen bg-gradient-to-br from-white to-[#F28C00]/20 font-sans;
+}
+
+a {
+  @apply text-[#F28C00] hover:text-[#EF7C00] font-medium transition-colors underline;
+}
