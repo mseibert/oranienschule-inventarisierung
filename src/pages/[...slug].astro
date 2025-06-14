@@ -87,7 +87,7 @@ export async function getStaticPaths() {
 const allPages = await getStaticPaths();
 const { title, text, item, teil } = Astro.props;
 ---
-<Layout>
+<Layout title={`${item?.Bezeichnung} (${item?.Name} ${teil ? '#' + teil.slice(4) : ''}) - Inventar der Oranienschule, Wiesbaden`}>
 	<InventarList pages={allPages} />
 	<Inventar item={item} teil={teil} />
 </Layout>

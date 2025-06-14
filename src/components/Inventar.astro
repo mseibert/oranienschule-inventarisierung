@@ -7,302 +7,131 @@ import { Image } from 'astro:assets';
 
 ---
 
-<div id="container">
-	<img id="background" src={background.src} alt="" fetchpriority="high" />
-	<main>
-		<section id="hero">
+<div class="min-h-screen bg-gradient-to-br from-white to-orange-400/20 relative">
+	<img class="fixed inset-0 w-full h-full object-cover opacity-20 -z-10" src={background.src} alt="" fetchpriority="high" />
+	<main class="container mx-auto px-4 py-8">
+		<section class="max-w-4xl mx-auto">
+			<h1 class="text-2xl md:text-3xl font-semibold text-gray-900 mb-6">
+				{`${item?.Bezeichnung} (${item?.Name} ${teil ? '#' + teil.slice(4) : ''})`}
+			</h1>
 			
-				<h1>{item?.Name} ({teil}) / {item?.Bezeichnung}</h1>
-			
-		<table class="inventory-table">
-			<thead>
-				<tr>
-					<th>Eigenschaft</th>
-					<th>Wert</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<th>Name</th>
-					<td>{item?.Name}</td>
-				</tr>
-				<tr>
-					<th>Bild</th>
-					<td>
-						{item?.Bilddownload && item.Bilddownload.map((image, index) => (
-							<button popovertarget={`image-${index}`} class="image-button">
-								<Image 
-									src={image} 
-									inferSize={true}
-									alt={`Bild ${index + 1} von ${item.Name}`} 
-									style="max-width: 100px; max-height: 100px; object-fit: contain; margin: 0.5rem;" 
-								/>
-							</button>
-							<div popover id={`image-${index}`} class="image-popover">
-								<button popovertarget={`image-${index}`} popovertargetaction="hide" class="close-button">×</button>
-								<Image 
-									src={image} 
-									inferSize={true}
-									alt={`Bild ${index + 1} von ${item.Name}`} 
-									style="max-width: 80vw; max-height: 80vh; object-fit: contain;" 
-								/>
-							</div>
-						))}
-					</td>
-				</tr>
-				<tr>
-					<th>QR-Code</th>
-					<td>{item?.['QR-Code']}</td>
-				</tr>
-				<tr>
-					<th>Kategorie</th>
-					<td>{item?.Kategorie}</td>
-				</tr>
-				<tr>
-					<th>Hersteller/Marke/Autor/Komponist</th>
-					<td>{item?.['Hersteller/Marke/Autor/Komponist']}</td>
-				</tr>
-				<tr>
-					<th>Modell</th>
-					<td>{item?.Modell}</td>
-				</tr>
-				<tr>
-					<th>Seriennummer</th>
-					<td>{item?.Seriennummer}</td>
-				</tr>
-				<tr>
-					<th>Anschaffungsdatum</th>
-					<td>{item?.Anschaffungsdatum}</td>
-				</tr>
-				<tr>
-					<th>Anschaffungskosten</th>
-					<td>{item?.Anschaffungskosten} €</td>
-				</tr>
-				<tr>
-					<th>Zustand</th>
-					<td>{item?.Zustand}</td>
-				</tr>
-				<tr>
-					<th>Letzte Wartung</th>
-					<td>{item?.['Letzte Wartung']}</td>
-				</tr>
-				<tr>
-					<th>Verleihstatus</th>
-					<td>{item?.Verleihstatus}</td>
-				</tr>
-				<tr>
-					<th>Verantwortlich</th>
-					<td>{item?.Verantwortlich}</td>
-				</tr>
-				<tr>
-					<th>Bemerkungen</th>
-					<td>{item?.Bemerkungen}</td>
-				</tr>
-			</tbody>
-		</table>
+			<div class="bg-white rounded-lg shadow-md overflow-hidden">
+				<div class="overflow-x-auto">
+					<table class="w-full">
+						<thead>
+							<tr class="bg-gray-50">
+								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500 w-1/3">Eigenschaft</th>
+								<th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Wert</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-200">
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Name</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Name}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Bild</th>
+								<td class="px-6 py-4">
+									<div class="flex flex-wrap gap-4">
+										{item?.Bilddownload && item.Bilddownload.map((image, index) => (
+											<>
+												<button 
+													onclick={`document.getElementById('image-${index}').classList.toggle('hidden')`}
+													class="group"
+												>
+													<Image 
+														src={image} 
+														inferSize={true}
+														alt={`Bild ${index + 1} von ${item.Name}`} 
+														class="w-24 h-24 object-contain rounded-lg shadow-sm transition-transform group-hover:scale-105" 
+													/>
+												</button>
+												<div 
+													id={`image-${index}`}
+													class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 hidden"
+												>
+													<button 
+														onclick={`document.getElementById('image-${index}').classList.add('hidden')`}
+														class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300"
+													>×</button>
+													<Image 
+														src={image} 
+														inferSize={true}
+														alt={`Bild ${index + 1} von ${item.Name}`} 
+														class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg" 
+													/>
+												</div>
+											</>
+										))}
+									</div>
+								</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">QR-Code</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.['QR-Code']}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Kategorie</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Kategorie}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Hersteller/Marke/Autor/Komponist</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.['Hersteller/Marke/Autor/Komponist']}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Modell</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Modell}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Seriennummer</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Seriennummer}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Anschaffungsdatum</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Anschaffungsdatum}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Anschaffungskosten</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Anschaffungskosten} €</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Zustand</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Zustand}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Letzte Wartung</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.['Letzte Wartung']}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Verleihstatus</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Verleihstatus}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Verantwortlich</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Verantwortlich}</td>
+							</tr>
+							<tr class="hover:bg-gray-50">
+								<th class="px-6 py-4 text-sm font-medium text-gray-900">Bemerkungen</th>
+								<td class="px-6 py-4 text-sm text-gray-500">{item?.Bemerkungen}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
 
-		<div>Wenden Sie sich bei Fragen zu diesem Inventarteil an die verantwortliche Person aus der Tabelle.<br /><br /><br />
-		</div>
-
-		<style>
-			.inventory-table {
-				width: 100%;
-				border-collapse: collapse;
-				margin: 1rem 0;
-				background: white;
-				box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-			}
-
-			.inventory-table th,
-			.inventory-table td {
-				padding: 0.75rem;
-				text-align: left;
-				border-bottom: 1px solid #e5e7eb;
-			}
-
-			.inventory-table th {
-				background-color: #f9fafb;
-				font-weight: 600;
-				color: #374151;
-				width: 40%;
-			}
-
-			.inventory-table td {
-				color: #1f2937;
-			}
-
-			.inventory-table tbody tr:hover {
-				background-color: #f3f4f6;
-			}
-		</style>
+			<div class="mt-8 text-sm text-gray-600">
+				Wenden Sie sich bei Fragen zu diesem Inventarteil an die verantwortliche Person aus der Tabelle.
+			</div>
 		</section>
 	</main>
+</div>
 
-<style>
-	#background {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		background: linear-gradient(45deg, #ffffff, #ff8c00);
-		opacity: 0.2;
-	}
-
-	#container {
-		font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
-		height: 100%;
-	}
-
-	main {
-		height: 100%;
-		display: flex;
-		justify-content: center;
-	}
-
-	#hero {
-		display: flex;
-		align-items: start;
-		flex-direction: column;
-		justify-content: center;
-		padding: 16px;
-	}
-
-	h1 {
-		font-size: 22px;
-		margin-top: 0.25em;
-	}
-
-	#links {
-		display: flex;
-		gap: 16px;
-	}
-
-	#links a {
-		display: flex;
-		align-items: center;
-		padding: 10px 12px;
-		color: #111827;
-		text-decoration: none;
-		transition: color 0.2s;
-	}
-
-	#links a:hover {
-		color: rgb(78, 80, 86);
-	}
-
-	#links a svg {
-		height: 1em;
-		margin-left: 8px;
-	}
-
-	#links a.button {
-		color: white;
-		background: linear-gradient(83.21deg, #3245ff 0%, #bc52ee 100%);
-		box-shadow:
-			inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-			inset 0 -2px 0 rgba(0, 0, 0, 0.24);
-		border-radius: 10px;
-	}
-
-	#links a.button:hover {
-		color: rgb(230, 230, 230);
-		box-shadow: none;
-	}
-
-	pre {
-		font-family:
-			ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono',
-			monospace;
-		font-weight: normal;
-		background: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-		margin: 0;
-	}
-
-	h2 {
-		margin: 0 0 1em;
-		font-weight: normal;
-		color: #111827;
-		font-size: 20px;
-	}
-
-	p {
-		color: #4b5563;
-		font-size: 16px;
-		line-height: 24px;
-		letter-spacing: -0.006em;
-		margin: 0;
-	}
-
-	code {
-		display: inline-block;
-		background:
-			linear-gradient(66.77deg, #f3cddd 0%, #f5cee7 100%) padding-box,
-			linear-gradient(155deg, #d83333 0%, #f041ff 18%, #f5cee7 45%) border-box;
-		border-radius: 8px;
-		border: 1px solid transparent;
-		padding: 6px 8px;
-	}
-
-	.box {
-		padding: 16px;
-		background: rgba(255, 255, 255, 1);
-		border-radius: 16px;
-		border: 1px solid white;
-	}
-
-	#news {
-		position: absolute;
-		bottom: 16px;
-		right: 16px;
-		max-width: 300px;
-		text-decoration: none;
-		transition: background 0.2s;
-		backdrop-filter: blur(50px);
-	}
-
-	#news:hover {
-		background: rgba(255, 255, 255, 0.55);
-	}
-
-	@media screen and (max-height: 368px) {
-		#news {
-			display: none;
+<script>
+	// Close modal when clicking outside
+	document.addEventListener('click', (e) => {
+		const target = e.target as HTMLElement;
+		if (target.classList.contains('fixed') && target.classList.contains('inset-0')) {
+			target.classList.add('hidden');
 		}
-	}
-
-	@media screen and (max-width: 768px) {
-		#container {
-			display: flex;
-			flex-direction: column;
-		}
-
-		#hero {
-			display: block;
-			padding-top: 10%;
-		}
-
-		#links {
-			flex-wrap: wrap;
-		}
-
-		#links a.button {
-			padding: 14px 18px;
-		}
-
-		#news {
-			right: 16px;
-			left: 16px;
-			bottom: 2.5rem;
-			max-width: 100%;
-		}
-
-		h1 {
-			line-height: 1.5;
-		}
-	}
-</style>
+	});
+</script>
