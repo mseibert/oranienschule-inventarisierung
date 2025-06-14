@@ -34,6 +34,7 @@ export interface inventarTeil {
     Verantwortlich: string;
     Bemerkungen: string;
     'QR-Code': string | null;
+    teil?: string | null;
     _locked: null;
     _locked_by: null;
     _archived: boolean;
@@ -54,6 +55,8 @@ export async function getStaticPaths() {
     slug: string | undefined;
     title: string;
     text: string;
+    qrcode: string | null;
+    teil: string | undefined;
     item?: any;
   };
 
@@ -62,24 +65,27 @@ export async function getStaticPaths() {
       slug: `${item._id}`,
       title: item.Name,
       text: item.Bezeichnung,
+      qrcode: item['QR-Code'],
+      teil: item['QR-Code'] ? new URL(item['QR-Code']).pathname.split('/').pop() : 'keine Nummer gefunden',
       item: item
     }))
   ];
+  console.log(pages);
 
-  return pages.map(({ slug, title, text, item }) => {
+  return pages.map(({ slug, title, text, item, teil }) => {
     return {
       params: { slug },
-      props: { title, text, item },
+      props: { title, text, item, teil },
     };
   });
 }
 
 const allPages = await getStaticPaths();
-const { title, text, item } = Astro.props;
+const { title, text, item, teil } = Astro.props;
 ---
 <Layout>
 	<InventarList pages={allPages} />
-	<Inventar item={item} />
+	<Inventar item={item} teil={teil} />
 </Layout>
 
 <style>

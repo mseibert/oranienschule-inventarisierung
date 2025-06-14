@@ -2,10 +2,9 @@
 import astroLogo from '../assets/astro.svg';
 import background from '../assets/background.svg';
 import type { inventarTeil } from '../pages/[...slug].astro';
-const { item } = Astro.props as { item?: inventarTeil['results'][0] };
+const { teil, item } = Astro.props as { teil?: string, item?: inventarTeil['results'][0] };
 import { Image } from 'astro:assets';
 
-// console.log('item', item?.Bilddownload);
 ---
 
 <div id="container">
@@ -13,7 +12,7 @@ import { Image } from 'astro:assets';
 	<main>
 		<section id="hero">
 			
-				<h1>{item?.Name} / {item?.Bezeichnung}</h1>
+				<h1>{item?.Name} ({teil}) / {item?.Bezeichnung}</h1>
 			
 		<table class="inventory-table">
 			<thead>
@@ -50,6 +49,10 @@ import { Image } from 'astro:assets';
 							</div>
 						))}
 					</td>
+				</tr>
+				<tr>
+					<th>QR-Code</th>
+					<td>{item?.['QR-Code']}</td>
 				</tr>
 				<tr>
 					<th>Kategorie</th>
