@@ -11,38 +11,14 @@ const pages = allPages.map(({ params, props }) => ({
 
 ---
 <Layout>
-	<div class="links">
-		{allPages.map(({ params, props }) => (
-		  <div class="link-item">
-			<a href={params.slug ? `/${params.slug}` : '/'}>{props.title}</a>
-		  </div>
-		))}
-	  </div>	
+
+  <div class="flex flex-wrap gap-4 p-4">
+    {allPages.map(({ params, props }) => (
+      <div class="p-2 border border-gray-200 rounded-md transition-all duration-200 hover:bg-gray-100 hover:translate-x-2">
+        <a href={params.slug ? `/${params.slug}` : '/'} class="no-underline text-gray-700">
+          {props.title}
+        </a>
+      </div>
+    ))}
+  </div>
 </Layout>
-  
-  <style>
-	.links {
-	  display: flex;
-	  flex-wrap: wrap;
-	  gap: 1rem;
-	  padding: 1rem;
-	}
-  
-	.link-item {
-	  padding: 0.5rem;
-	  border: 1px solid #e5e7eb;
-	  border-radius: 0.375rem;
-	  transition: all 0.2s;
-	}
-  
-	.link-item:hover {
-	  background-color: #f3f4f6;
-	  transform: translateX(0.5rem);
-	}
-  
-	.link-item a {
-	  text-decoration: none;
-	  color: #374151;
-	}
-  </style>
-  
