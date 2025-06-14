@@ -1,0 +1,39 @@
+---
+import logo from '../assets/logo.png';
+import { Image } from 'astro:assets';
+---
+
+<header class="header">
+    <div class="logo-container">
+        <a href="/">
+            <Image src={import('../assets/logo.png')} alt="Oranienschule Logo" class="logo" />
+        </a>
+        <h1>Inventar der Oranienschule</h1>
+    </div>
+</header>
+
+<style>
+    .header {
+        background-color: #fff;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo {
+        height: 50px;
+        width: auto;
+    }
+
+    h1 {
+        margin: 0;
+        font-family: 'Oranienschule', sans-serif;
+        font-size: 1.5rem;
+        color: #333;
+    }
+</style> 
