@@ -1,5 +1,11 @@
 export async function GET(request: Request) {
-    return new Response('Hello from Vercel!');
+    const url = new URL(request.url);
+    const params = Object.fromEntries(url.searchParams);
+    
+    return new Response(JSON.stringify(params), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
 }
 
 export async function POST(request: Request) {
