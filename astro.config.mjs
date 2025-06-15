@@ -2,6 +2,8 @@
 import { defineConfig } from 'astro/config';
 
 import vercel from '@astrojs/vercel';
+import vercelServerless from "@astrojs/vercel/serverless";
+import vercelStatic from "@astrojs/vercel/static";
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -13,7 +15,7 @@ export default defineConfig({
       domains: ["cloud.seatable.io"],
   },
 
-  adapter: vercel({
+  adapter: vercelServerless({
     webAnalytics: {
       enabled: true,
     },
