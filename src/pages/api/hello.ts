@@ -3,7 +3,14 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-    const body = await request.json();
-    console.log(body);
-    return new Response('Hello from Vercel!' + body);
-}
+    // Request-Body als JSON parsen
+    const data = await request.json();
+  
+  
+    // Antwort zurückgeben
+    return new Response(JSON.stringify(data), {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+  
