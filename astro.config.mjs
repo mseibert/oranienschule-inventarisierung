@@ -13,7 +13,11 @@ export default defineConfig({
       domains: ["cloud.seatable.io"],
   },
 
-  adapter: vercel(),
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    },
+  }),
 
   vite: {
     plugins: [tailwindcss()]
