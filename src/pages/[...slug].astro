@@ -1,6 +1,5 @@
 ---
 import Inventar from '../components/Inventar.astro';
-import InventarList from '../components/InventarList.astro';
 import Layout from '../layouts/Layout.astro';
 import { getSeatableMetadata, getInventarListWithImages } from '../lib/seatable';
 
@@ -88,32 +87,5 @@ const allPages = await getStaticPaths();
 const { title, text, item, teil } = Astro.props;
 ---
 <Layout title={`${item?.Bezeichnung} (${item?.Name} ${teil ? '#' + teil.slice(4) : ''}) - Inventar der Oranienschule, Wiesbaden`}>
-	<InventarList pages={allPages} />
 	<Inventar item={item} teil={teil} />
 </Layout>
-
-<style>
-  .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  .link-item {
-    padding: 0.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.375rem;
-    transition: all 0.2s;
-  }
-
-  .link-item:hover {
-    background-color: #f3f4f6;
-    transform: translateX(0.5rem);
-  }
-
-  .link-item a {
-    text-decoration: none;
-    color: #374151;
-  }
-</style>

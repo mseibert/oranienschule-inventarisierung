@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { getStaticPaths } from '../pages/[...slug].astro';
+import ContactForm from '../components/ContactForm.astro';
 const allPages = await getStaticPaths();
 
 const pages = allPages.map(({ params, props }) => ({
@@ -11,6 +12,12 @@ const pages = allPages.map(({ params, props }) => ({
 
 ---
 <Layout>
+
+	<div class="max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg">
+		<h1 class="text-3xl font-bold mb-8 text-gray-800 text-center">Nimm Kontakt auf</h1>
+		<p class="text-gray-600 text-center mb-8">Die Inventarisierung wird von Juliane Seibert, Cathrin Weinig, Simon Weinig und Andrea Wettermann geleitet. Du kannst uns jederzeit über das unten stehende Formular kontaktieren.</p>
+		<ContactForm />
+	</div>
 
   <div class="flex flex-wrap gap-4 p-4">
     {allPages.map(({ params, props }) => (

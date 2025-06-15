@@ -4,10 +4,10 @@ import background from '../assets/background.svg';
 import type { inventarTeil } from '../pages/[...slug].astro';
 const { teil, item } = Astro.props as { teil?: string, item?: inventarTeil['results'][0] };
 import { Image } from 'astro:assets';
-
+import ContactForm from './ContactForm.astro';
 ---
 
-<div class="min-h-screen bg-gradient-to-br from-white to-orange-400/20 relative">
+<div class="min-h-screen relative">
 	<img class="fixed inset-0 w-full h-full object-cover opacity-20 -z-10" src={background.src} alt="" fetchpriority="high" />
 	<main class="container mx-auto px-4 py-8">
 		<section class="max-w-4xl mx-auto">
@@ -118,9 +118,9 @@ import { Image } from 'astro:assets';
 					</table>
 				</div>
 			</div>
-
-			<div class="mt-8 text-sm text-gray-600">
-				Wenden Sie sich bei Fragen zu diesem Inventarteil an die verantwortliche Person aus der Tabelle.
+			<div class="max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg mt-8">
+				<h1 class="text-3xl font-bold mb-8 text-gray-800 text-center">Schreibe uns zu diesem Inventarteil</h1>
+				<ContactForm />
 			</div>
 		</section>
 	</main>
