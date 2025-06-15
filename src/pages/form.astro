@@ -45,7 +45,7 @@ import Layout from '../layouts/Layout.astro';
       submitButton.textContent = 'Sending...';
       errorMessage.classList.add('hidden');
       
-      const response = await fetch('/formsubmit', {
+      const response = await fetch('/api/formsubmit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

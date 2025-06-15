@@ -20,15 +20,7 @@
 			"dest": "_render"
 		},
 		{
-			"src": "^/api/feedback/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/api/register/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/form/?$",
+			"src": "^/api/formsubmit/?$",
 			"dest": "_render"
 		},
 		{
