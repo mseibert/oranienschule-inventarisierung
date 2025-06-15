@@ -2,9 +2,14 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const params = Object.fromEntries(url.searchParams);
     
+    console.log('Received request with params:', params);
+    
     return new Response(JSON.stringify(params), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
     });
 }
 
