@@ -1,8 +1,15 @@
 export async function GET(request: Request) {
     const url = new URL(request.url);
-    const params = Object.fromEntries(url.searchParams);
+    console.log('Full URL:', request.url);
     
-    console.log('Received request with params:', params);
+    // Alternative Methode zur Extraktion der Parameter
+    const searchParams = new URLSearchParams(url.search);
+    const params: Record<string, string> = {};
+    for (const [key, value] of searchParams.entries()) {
+        params[key] = value;
+    }
+    
+    console.log('Extracted params:', params);
     
     return new Response(JSON.stringify(params), {
       status: 200,
@@ -12,16 +19,3 @@ export async function GET(request: Request) {
       },
     });
 }
-
-export async function POST(request: Request) {
-    // Request-Body als JSON parsen
-    const data = await request.json();
-  
-  
-    // Antwort zurückgeben
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { 'Content-Type': 'text/plain' },
-    });
-  }
-  
