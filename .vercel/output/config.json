@@ -20,7 +20,7 @@
 			"dest": "_render"
 		},
 		{
-			"src": "^/api/test/?$",
+			"src": "^/test\\.json/?$",
 			"dest": "_render"
 		},
 		{

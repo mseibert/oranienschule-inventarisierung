@@ -1,9 +1,12 @@
-export { renderers } from '../../renderers.mjs';
+export { renderers } from '../renderers.mjs';
 
 const prerender = false;
 const POST = async ({ request }) => {
-  const data = await request.json();
-  const { name, email, message } = data;
+  const formData = await request.formData();
+  const data = {};
+  for (const [key, value] of formData.entries()) {
+    data[key] = value.toString();
+  }
   return new Response(
     JSON.stringify({ success: true, received: { data } }),
     {
