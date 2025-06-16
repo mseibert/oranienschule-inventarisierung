@@ -3,12 +3,29 @@ import logo from '../assets/logo.png';
 import { Image } from 'astro:assets';
 ---
 
-<header class="bg-white py-4 px-8 shadow-md">
-    <div class="flex items-center gap-4">
-        <a href="/">
-            <Image src={import('../assets/logo.png')} alt="Oranienschule Logo" class="h-[50px] w-auto" />
+<header class="bg-white py-4 px-4 sm:px-8 shadow-md rounded-lg">
+    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+        <a href="/" class="flex-shrink-0">
+            <Image 
+                src={logo} 
+                alt="Oranienschule Logo" 
+                width={400} 
+                height={115} 
+                class="w-full max-w-[180px] sm:max-w-[250px] md:max-w-[350px] lg:max-w-[400px] h-auto"
+            />
         </a>
-        <h1 class="m-0 font-sans text-2xl text-gray-700">Inventar der Oranienschule</h1>
-        <a href="/form" class="text-orange-500 hover:text-orange-600 font-medium transition-colors underline">Kontakt</a>
+        <div class="flex flex-col sm:flex-row sm:items-center w-full justify-between">
+            <div class="w-full overflow-x-auto whitespace-nowrap">
+                <h1 class="m-0 font-sans text-base sm:text-lg md:text-xl lg:text-2xl text-gray-700 text-center sm:text-left">
+                    Inventar der Oranienschule
+                </h1>
+            </div>
+            <a 
+                href="/form" 
+                class="hidden sm:inline text-orange-500 hover:text-orange-600 font-medium transition-colors underline text-center sm:text-left sm:ml-4"
+            >
+                Kontakt
+            </a>
+        </div>
     </div>
 </header> 
