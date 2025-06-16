@@ -1,29 +1,22 @@
-import type { APIRoute } from 'astro';
+export const prerender = false;
 
-export const GET: APIRoute = async (context) => {
-  // Try to use context.url, fallback to reconstructing the URL
-  let url: URL;
-  if ('url' in context && context.url) {
-    url = context.url;
-  } else {
-    // Fallback: reconstruct using request.url and a dummy origin
-    url = new URL(context.request.url, 'http://localhost');
-  }
+// src/pages/api/form-submit.ts
+import type { APIRoute } from "astro";
 
-  const params: Record<string, string> = {};
-  for (const [key, value] of url.searchParams.entries()) {
-    params[key] = value;
-  }
+export const POST: APIRoute = async ({ request }) => {
+  // Formulardaten als JSON empfangen
+  const data = await request.json();
 
-  return new Response(JSON.stringify({
-    message: "Test API endpoint is working",
-    timestamp: new Date().toISOString(),
-    method: 'GET',
-    queryParams: params
-  }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json'
+  // Beispiel: Zugriff auf Felder
+  const { name, email, message } = data;
+
+  // Hier könntest du die Daten weiterverarbeiten (z.B. speichern, E-Mail senden, etc.)
+
+  return new Response(
+    JSON.stringify({ success: true, received: { data } }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     }
-  });
+  );
 };
