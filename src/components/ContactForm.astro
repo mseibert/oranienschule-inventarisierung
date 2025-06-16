@@ -2,7 +2,7 @@
 ---
 
 <div class="max-w-md mx-auto">
-    <form id="registerForm" class="space-y-6">
+    <form id="ContactForm" class="space-y-6">
   
       <div class="space-y-2">
         <label class="block text-lg font-medium text-gray-700">
@@ -35,13 +35,13 @@
         class="w-full bg-orange-500 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors mt-8"
         id="submitButton"
       >
-        Register
+        Absenden
       </button>
     </form>
   </div>
   
   <script>
-    const form = document.getElementById('registerForm');
+    const form = document.getElementById('ContactForm');
     const submitButton = document.getElementById('submitButton') as HTMLButtonElement;
     const errorMessage = document.getElementById('errorMessage');
     const emailInput = document.querySelector('input[name=email]') as HTMLInputElement;
