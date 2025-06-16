@@ -25,10 +25,6 @@ export const POST: APIRoute = async ({ request }) => {
 
   const result = await response.json();
 
-  console.log(result);
-
-  // Hier könntest du die Daten weiterverarbeiten (z.B. speichern, E-Mail senden, etc.)
-
   return new Response(
     JSON.stringify({ success: true, received: { data }, result: result }),
     {

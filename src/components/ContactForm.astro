@@ -57,7 +57,7 @@
         submitButton.textContent = 'Absenden...';
         errorMessage.classList.add('hidden');
         
-        const response = await fetch('/api/test', {
+        const response = await fetch('/api/form', {
           method: 'POST',
           body: new FormData(form as HTMLFormElement)
         });
