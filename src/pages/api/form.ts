@@ -19,7 +19,8 @@ export const POST: APIRoute = async ({ request }) => {
     },
     body: JSON.stringify({
       email: data.email,
-      message: data.message
+      message: data.message,
+      referrer: data.referrer
     })
   });
 

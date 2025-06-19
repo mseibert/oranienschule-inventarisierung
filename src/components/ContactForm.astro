@@ -27,6 +27,7 @@
           />
         </label>
       </div>
+      <input type="hidden" name="referrer" id="referrerInput" />
   
       <p id="errorMessage" class="text-red-500 text-sm mt-1 hidden"></p>
   
@@ -46,11 +47,15 @@
     const errorMessage = document.getElementById('errorMessage');
     const emailInput = document.querySelector('input[name=email]') as HTMLInputElement;
     const messageInput = document.querySelector('textarea[name=message]') as HTMLTextAreaElement;
+    const referrerInput = document.getElementById('referrerInput') as HTMLInputElement;
   
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      if (!emailInput || !submitButton || !errorMessage) return;
+      if (!emailInput || !submitButton || !errorMessage || !referrerInput) return;
+      
+      // Setze die aktuelle Seite als Referrer
+      referrerInput.value = window.location.href;
       
       try {
         submitButton.disabled = true;
