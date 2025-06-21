@@ -20,7 +20,8 @@ export const POST: APIRoute = async ({ request }) => {
     body: JSON.stringify({
       email: data.email,
       message: data.message,
-      referrer: data.referrer
+      referrer: data.referrer,
+      currentPage: data.currentPage
     })
   });
 

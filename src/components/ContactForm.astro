@@ -27,6 +27,7 @@
           />
         </label>
       </div>
+      <input type="hidden" name="currentPage" id="currentPageInput" />
       <input type="hidden" name="referrer" id="referrerInput" />
   
       <p id="errorMessage" class="text-red-500 text-sm mt-1 hidden"></p>
@@ -47,15 +48,19 @@
     const errorMessage = document.getElementById('errorMessage');
     const emailInput = document.querySelector('input[name=email]') as HTMLInputElement;
     const messageInput = document.querySelector('textarea[name=message]') as HTMLTextAreaElement;
+    const currentPageInput = document.getElementById('currentPageInput') as HTMLInputElement;
     const referrerInput = document.getElementById('referrerInput') as HTMLInputElement;
   
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      if (!emailInput || !submitButton || !errorMessage || !referrerInput) return;
+      if (!emailInput || !submitButton || !errorMessage || !currentPageInput || !referrerInput) return;
       
-      // Setze die aktuelle Seite als Referrer
-      referrerInput.value = window.location.href;
+      // Setze die aktuelle Seite
+      currentPageInput.value = window.location.href;
+      
+      // Setze den tatsächlichen Referrer (die vorherige Seite)
+      referrerInput.value = document.referrer;
       
       try {
         submitButton.disabled = true;
