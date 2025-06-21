@@ -27,6 +27,25 @@
           />
         </label>
       </div>
+
+      <details class="group">
+        <summary class="cursor-pointer text-lg font-medium text-gray-700 hover:text-gray-900 transition-colors">
+          📎 Dateianhang hinzufügen (optional)
+        </summary>
+        <div class="mt-4 space-y-2">
+          <label class="block text-lg font-medium text-gray-700">
+            Datei auswählen:
+            <input 
+              type="file" 
+              name="attachment" 
+              accept="image/*,.pdf,.doc,.docx,.txt"
+              class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+            />
+          </label>
+          <p class="text-sm text-gray-500">Unterstützte Formate: Bilder, PDF, DOC, DOCX, TXT (max. 5MB)</p>
+        </div>
+      </details>
+
       <input type="hidden" name="currentPage" id="currentPageInput" />
       <input type="hidden" name="referrer" id="referrerInput" />
   
@@ -48,6 +67,7 @@
     const errorMessage = document.getElementById('errorMessage');
     const emailInput = document.querySelector('input[name=email]') as HTMLInputElement;
     const messageInput = document.querySelector('textarea[name=message]') as HTMLTextAreaElement;
+    const fileInput = document.querySelector('input[name=attachment]') as HTMLInputElement;
     const currentPageInput = document.getElementById('currentPageInput') as HTMLInputElement;
     const referrerInput = document.getElementById('referrerInput') as HTMLInputElement;
   
@@ -55,6 +75,18 @@
       e.preventDefault();
       
       if (!emailInput || !submitButton || !errorMessage || !currentPageInput || !referrerInput) return;
+      
+      // Überprüfe Dateigröße (max. 5MB)
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        const fileSize = fileInput.files[0].size;
+        const maxSize = 5 * 1024 * 1024; // 5MB in Bytes
+        
+        if (fileSize > maxSize) {
+          errorMessage.textContent = 'Die Datei ist zu groß. Maximale Größe: 5MB';
+          errorMessage.classList.remove('hidden');
+          return;
+        }
+      }
       
       // Setze die aktuelle Seite
       currentPageInput.value = window.location.href;
@@ -78,6 +110,7 @@
           alert('Absenden erfolgreich!');
           emailInput.value = '';
           messageInput.value = '';
+          if (fileInput) fileInput.value = '';
         } else {
           errorMessage.textContent = result.error || 'Absenden fehlgeschlagen. Bitte versuche es erneut.';
           errorMessage.classList.remove('hidden');
