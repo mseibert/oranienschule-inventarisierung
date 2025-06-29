@@ -1,5 +1,15 @@
 const token = import.meta.env.SEATABLE_API_TOKEN;
 
+// Überprüfe ob der Token gesetzt ist
+if (!token || token === 'your_token_here') {
+  console.error('SEATABLE_API_TOKEN Fehler:', {
+    token: token,
+    envKeys: Object.keys(import.meta.env).filter(key => key.includes('SEATABLE'))
+  });
+  throw new Error(
+    'SEATABLE_API_TOKEN ist nicht gesetzt. Bitte erstelle eine .env Datei mit deinem Seatable API Token.'
+  );
+}
 
 export async function getSeatableMetadata(token: string): Promise<SeatableMetadata> {
   const url = 'https://cloud.seatable.io/api/v2.1/dtable/app-access-token/';
@@ -11,12 +21,25 @@ export async function getSeatableMetadata(token: string): Promise<SeatableMetada
     }
   };
 
-  const response = await fetch(url, options);
-  return response.json();
+  try {
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Seatable Metadaten:', error);
+    throw error;
+  }
 }
 
 export async function getInventarList(metadata: SeatableMetadata): Promise<InventarTeil> {
-  const url = `${metadata.dtable_socket}/api-gateway/api/v2/dtables/${metadata.dtable_uuid}/sql`;
+  
+  const url = `${metadata.dtable_server}api/v2/dtables/${metadata.dtable_uuid}/sql`;
+  
   const options = {
     method: 'POST',
     headers: {
@@ -27,10 +50,20 @@ export async function getInventarList(metadata: SeatableMetadata): Promise<Inven
     body: JSON.stringify({sql: 'SELECT * FROM Inventarliste LIMIT 3', convert_keys: true})
   };
 
-  const response = await fetch(url, options);
-  return response.json();
-
-} 
+  try {
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Inventarliste:', error);
+    throw error;
+  }
+}
 
 export async function getImageDownloadLink(metadata: SeatableMetadata, images: Array<string[]>): Promise<string[]> {
     const cleanArray = images[0];
@@ -51,7 +84,6 @@ export async function getImageDownloadLink(metadata: SeatableMetadata, images: A
       try {
         const response = await fetch(url, options);
         const data = await response.json();
-        // console.log('data', data);
         return data.download_link;
       } catch (error) {
         console.error(`Error fetching download link for image ${image}:`, error);
@@ -63,20 +95,30 @@ export async function getImageDownloadLink(metadata: SeatableMetadata, images: A
 }
 
 export async function getInventarListWithImages(metadata: SeatableMetadata): Promise<InventarTeil> {
-  const inventarList = await getInventarList(metadata);
-  
-  // Process each item to get image download links
-  const processedResults = await Promise.all(
-    inventarList.results.map(async (item) => {
-      if (item.Bild) {
-        const downloadLink = await getImageDownloadLink(metadata, [item.Bild]);
-        return { ...item, Bilddownload: downloadLink };
-      }
-      return { ...item, Bilddownload: null };
-    })
-  );
+  try {
+    const inventarList = await getInventarList(metadata);
+    
+    // Process each item to get image download links
+    const processedResults = await Promise.all(
+      inventarList.results.map(async (item) => {
+        if (item.Bild) {
+          try {
+            const downloadLink = await getImageDownloadLink(metadata, [item.Bild]);
+            return { ...item, Bilddownload: downloadLink };
+          } catch (error) {
+            console.error(`Fehler beim Abrufen des Bildes für ${item.Name}:`, error);
+            return { ...item, Bilddownload: null };
+          }
+        }
+        return { ...item, Bilddownload: null };
+      })
+    );
 
-  return { ...inventarList, results: processedResults };
+    return { ...inventarList, results: processedResults };
+  } catch (error) {
+    console.error('Fehler in getInventarListWithImages:', error);
+    throw error;
+  }
 }
 
 interface SeatableMetadata {
@@ -84,7 +126,7 @@ interface SeatableMetadata {
     access_token: string;
     dtable_uuid: string;
     dtable_server: string;
-    dtable_socket: string;
+    dtable_socket?: string;
     dtable_db: string;
     workspace_id: number;
     dtable_name: string;

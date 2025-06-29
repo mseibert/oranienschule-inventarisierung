@@ -1,5 +1,24 @@
 # Inventarisierung der Oranienschule
 
+## Setup
+
+### Umgebungsvariablen
+
+Erstelle eine `.env` Datei im Root-Verzeichnis des Projekts mit folgendem Inhalt:
+
+```env
+# Seatable API Configuration
+SEATABLE_API_TOKEN=your_token_here
+```
+
+**Wichtig:** Ersetze `your_token_here` mit deinem tatsächlichen Seatable API Token.
+
+### Installation
+
+```bash
+pnpm install
+```
+
 ## Project Structure
 
 Inside of your Astro project, you'll see the following folders and files:
