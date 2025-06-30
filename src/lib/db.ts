@@ -15,7 +15,7 @@ const firebaseConfig = {
 async function initializeFirebase() {
   if (firebaseConfig.project_id && firebaseConfig.client_email && firebaseConfig.private_key && firebaseConfig.private_key_id) {
     firestore = await Firestore.init({
-      uid: 'user1234',
+      uid: 'astro-inventar-oranienschule',
       project_id: firebaseConfig.project_id,
       client_email: firebaseConfig.client_email,
       private_key: firebaseConfig.private_key,
