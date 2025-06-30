@@ -20,12 +20,38 @@ import { Image } from 'astro:assets';
                     Inventar der Oranienschule
                 </h1>
             </div>
-            <a 
-                href="/form" 
-                class="hidden sm:inline text-orange-500 hover:text-orange-600 font-medium transition-colors underline text-center sm:text-left sm:ml-4"
-            >
-                Kontakt
-            </a>
+            <div class="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <a 
+                    href="/form" 
+                    class="text-orange-500 hover:text-orange-600 font-medium transition-colors underline text-center"
+                >
+                    Kontakt
+                </a>
+                <a 
+                    href="/api/auth/signin" 
+                    class="bg-orange-500 hover:bg-orange-600 text-white !text-white font-medium py-2 px-4 rounded transition-colors inline-block text-center no-underline"
+                    style="color: white !important; text-decoration: none;"
+                >
+                    Login
+                </a>
+                <button 
+                    id="logout" 
+                    class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded transition-colors hidden"
+                >
+                    Logout
+                </button>
+            </div>
         </div>
     </div>
-</header> 
+</header>
+
+<script>
+    const { signOut } = await import("auth-astro/client")
+    
+    const logoutButton = document.querySelector("#logout") as HTMLButtonElement
+    
+    // Handle logout button
+    if (logoutButton) {
+        logoutButton.addEventListener("click", () => signOut())
+    }
+</script> 

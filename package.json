@@ -15,6 +15,7 @@
     "@vercel/node": "^5.2.2",
     "astro": "^5.9.2",
     "auth-astro": "^4.2.0",
+    "firebase-admin": "^13.4.0",
     "fireworkers": "^0.4.2",
     "sharp": "^0.34.2",
     "tailwindcss": "^4.1.10",

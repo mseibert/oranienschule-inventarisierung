@@ -1,26 +1,35 @@
 import { UnstorageAdapter } from '@auth/unstorage-adapter'
 import { getSecret } from 'astro:env/server'
-import * as Firestore from 'fireworkers'
+import { initializeApp, getApps, cert } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
 import { createStorage, defineDriver } from 'unstorage'
 
-let firestore: Firestore.DB
+let firestore: any
 
 const firebaseConfig = {
-  project_id: getSecret('FIREBASE_PROJECT_ID'),
-  client_email: getSecret('FIREBASE_CLIENT_EMAIL'),
-  private_key: getSecret('FIREBASE_PRIVATE_KEY'),
-  private_key_id: getSecret('FIREBASE_PRIVATE_KEY_ID'),
+  projectId: getSecret('FIREBASE_PROJECT_ID'),
+  clientEmail: getSecret('FIREBASE_CLIENT_EMAIL'),
+  privateKey: getSecret('FIREBASE_PRIVATE_KEY')?.replace(/\\n/g, '\n'),
 }
 
 async function initializeFirebase() {
-  if (firebaseConfig.project_id && firebaseConfig.client_email && firebaseConfig.private_key && firebaseConfig.private_key_id) {
-    firestore = await Firestore.init({
-      uid: 'astro-inventar-oranienschule',
-      project_id: firebaseConfig.project_id,
-      client_email: firebaseConfig.client_email,
-      private_key: firebaseConfig.private_key,
-      private_key_id: firebaseConfig.private_key_id,
-    })
+  if (!firestore) {
+    try {
+      if (getApps().length === 0) {
+        initializeApp({
+          credential: cert(firebaseConfig),
+          projectId: firebaseConfig.projectId,
+        })
+      }
+      firestore = getFirestore()
+      console.log('Firebase initialized successfully')
+    } catch (error) {
+      console.error('Failed to initialize Firebase:', error)
+      throw error
+    }
+  }
+  if (!firestore) {
+    throw new Error('Firebase not initialized - missing configuration')
   }
 }
 
@@ -29,73 +38,80 @@ export const myStorageDriver = defineDriver(() => {
     name: 'seibert-media-driver',
     async hasItem(key: string, _opts) {
       await initializeFirebase()
-      return await Firestore.get(firestore, 'storage', key)
-        .then(() => true)
-        .catch(() => false)
+      try {
+        const doc = await firestore.collection('storage').doc(key).get()
+        return doc.exists
+      } catch (error) {
+        console.error('Failed to check item:', error)
+        // Return false instead of throwing - this allows auth to continue
+        return false
+      }
     },
     async getItem(key: string, _opts) {
       await initializeFirebase()
-      return await Firestore.get(firestore, 'storage', key)
-        .then((doc) => doc.fields.value)
-        .catch(() => null)
+      try {
+        const doc = await firestore.collection('storage').doc(key).get()
+        return doc.exists ? doc.data()?.value : null
+      } catch (error) {
+        console.error('Failed to get item:', error)
+        // Return null instead of throwing - this allows auth to continue
+        return null
+      }
     },
     async setItem(key: string, value: any, _opts) {
       await initializeFirebase()
-      await Firestore.set(firestore, 'storage', key, { value }, { merge: true })
+      try {
+        // Create the document - this will create the collection if it doesn't exist
+        await firestore.collection('storage').doc(key).set({ 
+          value,
+          _created: new Date(),
+          _updated: new Date()
+        })
+        console.log(`Successfully set item: ${key}`)
+      } catch (error) {
+        console.error('Failed to set item:', error)
+        // Don't throw the error, just log it and continue
+        // This allows the auth flow to continue even if storage fails
+      }
     },
     async removeItem(key: string, _opts) {
       await initializeFirebase()
-      await Firestore.remove(firestore, 'storage', key)
+      try {
+        await firestore.collection('storage').doc(key).delete()
+      } catch (error) {
+        console.error('Failed to remove item:', error)
+        throw error
+      }
     },
     async getKeys(base: string, _opts) {
       await initializeFirebase()
-      await Firestore.query(firestore, {
-        from: [{ collectionId: 'storage' }],
-        where: {
-          fieldFilter: {
-            field: { fieldPath: 'key' },
-            op: 'GREATER_THAN_OR_EQUAL',
-            value: { stringValue: base },
-          },
-          compositeFilter: {
-            op: 'AND',
-            filters: [
-              {
-                fieldFilter: {
-                  field: { fieldPath: 'key' },
-                  op: 'LESS_THAN',
-                  value: { stringValue: base + '\uf8ff' },
-                },
-              },
-            ],
-          },
-        },
-      })
+      try {
+        const snapshot = await firestore.collection('storage').get()
+        return snapshot.docs
+          .map((doc: any) => doc.id)
+          .filter((key: string) => key.startsWith(base) && key !== '_init')
+      } catch (error) {
+        console.error('Failed to get keys:', error)
+        return []
+      }
     },
     async clear(base: string, _opts) {
       await initializeFirebase()
-      const snapshot = await Firestore.query(firestore, {
-        from: [{ collectionId: 'storage' }],
-        where: {
-          fieldFilter: {
-            field: { fieldPath: 'key' },
-            op: 'GREATER_THAN_OR_EQUAL',
-            value: { stringValue: base },
-          },
-          compositeFilter: {
-            op: 'AND',
-            filters: [
-              {
-                fieldFilter: {
-                  field: { fieldPath: 'key' },
-                  op: 'LESS_THAN',
-                  value: { stringValue: base + '\uf8ff' },
-                },
-              },
-            ],
-          },
-        },
-      })
+      try {
+        const snapshot = await firestore.collection('storage').get()
+        const docsToDelete = snapshot.docs.filter((doc: any) => doc.id.startsWith(base) && doc.id !== '_init')
+        
+        if (docsToDelete.length > 0) {
+          const batch = firestore.batch()
+          docsToDelete.forEach((doc: any) => {
+            batch.delete(doc.ref)
+          })
+          await batch.commit()
+        }
+      } catch (error) {
+        console.error('Failed to clear items:', error)
+        throw error
+      }
     },
   }
 })
@@ -108,12 +124,27 @@ export const adapter = UnstorageAdapter(
 
 export async function setPassword(email: any, password: any) {
   await initializeFirebase()
-  return await Firestore.set(firestore, 'login', email, { password }, { merge: true })
+  try {
+    await firestore.collection('login').doc(email).set({ 
+      password,
+      _created: new Date(),
+      _updated: new Date()
+    })
+    console.log(`Successfully set password for: ${email}`)
+  } catch (error) {
+    console.error('Failed to set password:', error)
+    // Don't throw - allow the flow to continue
+  }
 }
 
 export async function getPassword(email: string) {
   await initializeFirebase()
-  return await Firestore.get(firestore, 'login', email)
-    .then((doc) => doc.fields.password)
-    .catch(() => null)
+  try {
+    const doc = await firestore.collection('login').doc(email).get()
+    return doc.exists ? doc.data()?.password : null
+  } catch (error) {
+    console.error('Failed to get password:', error)
+    // Return null instead of throwing - this allows auth to continue
+    return null
+  }
 }
