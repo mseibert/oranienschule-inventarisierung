@@ -1,14 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getStaticPaths } from '../pages/[...slug].astro';
 import ContactForm from '../components/ContactForm.astro';
-const allPages = await getStaticPaths();
 
-const pages = allPages.map(({ params, props }) => ({
-  slug: params.slug,
-  title: props.title,
-  text: props.text
-}));
 ---
 <Layout>
 
@@ -18,13 +11,5 @@ const pages = allPages.map(({ params, props }) => ({
 		<ContactForm />
 	</div>
 
-  <div class="flex flex-wrap gap-4 p-4">
-    {allPages.map(({ params, props }) => (
-      <div class="p-2 border border-gray-200 rounded-md transition-all duration-200 hover:bg-gray-100 hover:translate-x-2">
-        <a href={params.slug ? `/${params.slug}` : '/'} class="no-underline text-gray-700">
-          {props.title}
-        </a>
-      </div>
-    ))}
-  </div>
+  
 </Layout>

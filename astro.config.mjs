@@ -1,15 +1,12 @@
-// @ts-check
-import { defineConfig } from 'astro/config';
-
+import auth from 'auth-astro';
 import vercel from '@astrojs/vercel';
-
+import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
-// https://astro.build/config
 export default defineConfig({
-  output: 'static',
+  output: 'server',
   image: {
-      domains: ["cloud.seatable.io"],
+    domains: ["cloud.seatable.io"],
   },
   adapter: vercel({
     webAnalytics: {
@@ -19,4 +16,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
+  integrations: [auth({
+    config: './auth.config.ts'
+  })],
 });

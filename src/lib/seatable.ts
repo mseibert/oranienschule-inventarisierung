@@ -121,6 +121,64 @@ export async function getInventarListWithImages(metadata: SeatableMetadata): Pro
   }
 }
 
+export async function getInventarItemByTeil(metadata: SeatableMetadata, teilId: string): Promise<InventarTeil> {
+  
+  const url = `${metadata.dtable_server}api/v2/dtables/${metadata.dtable_uuid}/sql`;
+  const sqlQuery = `SELECT * FROM Inventarliste WHERE Teil = '${teilId}'`;
+  
+  const options = {
+    method: 'POST',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      authorization: `Bearer ${metadata.access_token}`
+    },
+    body: JSON.stringify({sql: sqlQuery, convert_keys: true})
+  };
+
+  try {
+    const response = await fetch(url, options);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Fehler beim Abrufen des Inventarteils:', error);
+    throw error;
+  }
+}
+
+export async function getInventarItemByTeilWithImages(metadata: SeatableMetadata, teilId: string): Promise<InventarTeil> {
+  try {
+    const inventarItem = await getInventarItemByTeil(metadata, teilId);
+    
+    // Process the item to get image download links
+    if (inventarItem.results.length > 0) {
+      const item = inventarItem.results[0];
+      if (item.Bild) {
+        try {
+          const downloadLink = await getImageDownloadLink(metadata, [item.Bild]);
+          const processedItem = { ...item, Bilddownload: downloadLink };
+          return { ...inventarItem, results: [processedItem] };
+        } catch (error) {
+          console.error(`Fehler beim Abrufen des Bildes für ${item.Name}:`, error);
+          const processedItem = { ...item, Bilddownload: null };
+          return { ...inventarItem, results: [processedItem] };
+        }
+      }
+      return { ...inventarItem, results: [{ ...item, Bilddownload: null }] };
+    }
+    
+    return inventarItem;
+  } catch (error) {
+    console.error('Fehler in getInventarItemByTeilWithImages:', error);
+    throw error;
+  }
+}
+
 interface SeatableMetadata {
     app_name: string;
     access_token: string;
@@ -151,6 +209,7 @@ interface SeatableMetadata {
       Verantwortlich: string;
       Bemerkungen: string;
       'QR-Code': string | null;
+      Teil: string | null;
       _locked: null;
       _locked_by: null;
       _archived: boolean;
