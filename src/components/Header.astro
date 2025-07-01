@@ -6,11 +6,20 @@ import { getSession } from 'auth-astro/server';
 // Session abrufen mit verbesserter Fehlerbehandlung
 let session = null;
 let isLoggedIn = false;
+let sessionError = null;
 
 try {
   session = await getSession(Astro.request);
   isLoggedIn = !!session?.user;
+  console.log('Header Session Debug:', {
+    hasSession: !!session,
+    hasUser: !!session?.user,
+    userEmail: session?.user?.email,
+    sessionKeys: session ? Object.keys(session) : [],
+    userKeys: session?.user ? Object.keys(session.user) : []
+  });
 } catch (error) {
+  sessionError = error;
   console.error('Fehler beim Abrufen der Session im Header:', error);
   isLoggedIn = false;
 }
@@ -91,6 +100,7 @@ try {
         logoutButton.addEventListener("click", async () => {
             try {
                 await signOut();
+                console.log('Logout successful')
                 // Seite neu laden nach dem Logout
                 window.location.reload();
             } catch (error) {

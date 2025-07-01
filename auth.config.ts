@@ -55,6 +55,7 @@ const authConfig = (): FullAuthConfig => {
     adapter,
     session: {
       strategy: 'database',
+      maxAge: 24 * 60 * 60, // 24 hours
     },
     jwt: {
       async encode({ token }) {
@@ -74,17 +75,17 @@ const authConfig = (): FullAuthConfig => {
         async authorize(credentials, _) {
           if (typeof credentials?.username !== 'string') throw new Error('Username not found.')
           if (typeof credentials?.password !== 'string') throw new Error('Password not found.')
+          
           // Add your own email validation logic
-          const doesUserExist = await getPassword(credentials.username)
+          const storedPassword = await getPassword(credentials.username)
+          
           // Sign In
-          if (doesUserExist) {
-            // console.log('Signing In', credentials.username)
+          if (storedPassword) {
+            console.log('Signing In', credentials.username)
             // Generate a randomized password based on the user's input password
             const randomizedPassword = generateRandomString(credentials.password)
-            // Hash the randomized password
-            const hashedPassword = hashPassword(randomizedPassword)
-            // Compare the hashed randomized password with the original password
-            const isPasswordCorrect = comparePassword(doesUserExist, hashedPassword)
+            // Compare the randomized password with the stored password
+            const isPasswordCorrect = comparePassword(randomizedPassword, storedPassword)
             if (isPasswordCorrect) {
               const user_details = await adapter.getUserByEmail?.(credentials.username)
               if (!user_details?.id) return null
@@ -96,8 +97,10 @@ const authConfig = (): FullAuthConfig => {
             }
           } else {
             // Sign Up
+            console.log('Signing Up', credentials.username)
             const randomizedPassword = generateRandomString(credentials.password)
-            await setPassword(credentials.username, randomizedPassword)
+            const hashedPassword = hashPassword(randomizedPassword)
+            await setPassword(credentials.username, hashedPassword)
             await adapter.createUser?.({ id: uuidv4(), email: credentials.username, emailVerified: null })
             const user_details = await adapter.getUserByEmail?.(credentials.username)
             if (!user_details?.id) return null
@@ -109,10 +112,25 @@ const authConfig = (): FullAuthConfig => {
     callbacks: {
       async jwt({ account, user, token }) {
         if (account?.provider === 'credentials' && user.id) {
-          const tmp = await adapter.createSession?.({ sessionToken: uuidv4(), userId: user.id, expires: new Date(Date.now() + 24 * 60 * 60 * 1000) })
-          if (tmp?.sessionToken) token.sessionId = tmp.sessionToken
+          console.log('Creating session for user:', user.email)
+          const tmp = await adapter.createSession?.({ 
+            sessionToken: uuidv4(), 
+            userId: user.id, 
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000) 
+          })
+          if (tmp?.sessionToken) {
+            token.sessionId = tmp.sessionToken
+            console.log('Session created successfully:', tmp.sessionToken)
+          } else {
+            console.error('Failed to create session')
+          }
         }
         return token
+      },
+      async session({ session, token }) {
+        console.log('Session callback - token:', token)
+        console.log('Session callback - session:', session)
+        return session
       },
     },
   }

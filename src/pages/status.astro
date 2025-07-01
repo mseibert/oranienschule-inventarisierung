@@ -18,6 +18,16 @@ try {
   userInfo = session?.user || null;
   sessionExpires = session?.expires ? new Date(session.expires) : null;
   isExpired = sessionExpires ? sessionExpires < new Date() : false;
+  
+  console.log('Status Page Session Debug:', {
+    hasSession: !!session,
+    hasUser: !!session?.user,
+    userEmail: session?.user?.email,
+    sessionKeys: session ? Object.keys(session) : [],
+    userKeys: session?.user ? Object.keys(session.user) : [],
+    isLoggedIn,
+    isExpired
+  });
 } catch (error) {
   sessionError = error;
   console.error('Fehler beim Abrufen der Session:', error);

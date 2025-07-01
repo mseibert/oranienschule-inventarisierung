@@ -1,9 +1,9 @@
 ---
-export const prerender = true;
+export const prerender = false;
 
 import Inventar from '../components/Inventar.astro';
 import Layout from '../layouts/Layout.astro';
-import { getSeatableMetadata, getInventarListWithImages } from '../lib/seatable';
+import { getSeatableMetadata, getInventarItemByTeilWithImages } from '../lib/seatable';
 
 interface SeatableMetadata {
   app_name: string;
@@ -47,47 +47,34 @@ export interface inventarTeil {
   }>;
 }
 
-export async function getStaticPaths() {
-  const token = import.meta.env.SEATABLE_API_TOKEN;
-  const seatableMetadata = await getSeatableMetadata(token);
-  const inventarList = await getInventarListWithImages(seatableMetadata);
+// Get the teil ID from the URL slug
+const { slug } = Astro.params;
+const teilId = slug;
 
-  type Page = {
-    slug: string | undefined;
-    title: string;
-    text: string;
-    qrcode: string | null;
-    teil: string | undefined;
-    item?: any;
-  };
-
-  const pages: Page[] = [
-    ...inventarList.results.map(item => ({
-      slug: `${item._id}`,
-      title: item.Name,
-      text: item.Bezeichnung,
-      qrcode: item['QR-Code'],
-      teil: item['QR-Code'] ? new URL(item['QR-Code']).pathname.split('/').pop() : 'keine Nummer gefunden',
-      item: item
-    }))
-  ];
-
-  return pages.flatMap(({ slug, title, text, item, teil }) => [
-    {
-      params: { slug },
-      props: { title, text, item, teil },
-    },
-    {
-      params: { slug: teil },
-      props: { title, text, item, teil },
-      redirect: `${slug}`
-    }
-  ]);
+if (!teilId) {
+  return Astro.redirect('/404');
 }
 
-const allPages = await getStaticPaths();
-const { title, text, item, teil } = Astro.props;
+let item: any;
+let teil: string | undefined;
+
+try {
+  const token = import.meta.env.SEATABLE_API_TOKEN;
+  const seatableMetadata = await getSeatableMetadata(token);
+  const inventarItem = await getInventarItemByTeilWithImages(seatableMetadata, teilId);
+
+  if (!inventarItem.results || inventarItem.results.length === 0) {
+    return Astro.redirect('/404');
+  }
+
+  item = inventarItem.results[0];
+  teil = item.Teil || 'keine Nummer gefunden';
+} catch (error) {
+  console.error('Fehler beim Laden des Inventarteils:', error);
+  return Astro.redirect('/404');
+}
 ---
+
 <Layout title={`${item?.Bezeichnung} (${item?.Name} ${teil ? '#' + teil.slice(4) : ''}) - Inventar der Oranienschule, Wiesbaden`}>
 	<Inventar item={item} teil={teil} />
 </Layout>
