@@ -3,7 +3,7 @@ import logo from '../assets/logo.png';
 import { Image } from 'astro:assets';
 import { getSession } from 'auth-astro/server';
 
-// Session abrufen
+// Session abrufen mit verbesserter Fehlerbehandlung
 let session = null;
 let isLoggedIn = false;
 
@@ -11,7 +11,8 @@ try {
   session = await getSession(Astro.request);
   isLoggedIn = !!session?.user;
 } catch (error) {
-  console.error('Fehler beim Abrufen der Session:', error);
+  console.error('Fehler beim Abrufen der Session im Header:', error);
+  isLoggedIn = false;
 }
 ---
 
@@ -43,7 +44,7 @@ try {
                     <a 
                         href="/api/auth/signin" 
                         id="login-btn"
-                        class="bg-orange-500 hover:bg-orange-600 text-white !text-white font-medium py-2 px-4 rounded transition-colors inline-block text-center no-underline"
+                        class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded transition-colors inline-block text-center no-underline"
                         style="color: white !important; text-decoration: none;"
                     >
                         Login
@@ -87,6 +88,15 @@ try {
     
     // Handle logout button
     if (logoutButton) {
-        logoutButton.addEventListener("click", () => signOut())
+        logoutButton.addEventListener("click", async () => {
+            try {
+                await signOut();
+                // Seite neu laden nach dem Logout
+                window.location.reload();
+            } catch (error) {
+                console.error('Fehler beim Logout:', error);
+                alert('Fehler beim Abmelden: ' + (error as Error).message);
+            }
+        });
     }
 </script> 

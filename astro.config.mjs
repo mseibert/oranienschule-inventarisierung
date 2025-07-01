@@ -16,5 +16,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
-  integrations: [auth()],
+  integrations: [auth({
+    config: './auth.config.ts'
+  })],
 });
