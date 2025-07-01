@@ -1,0 +1,208 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getSession } from 'auth-astro/server';
+
+// Session abrufen mit Fehlerbehandlung
+let session = null;
+let sessionError = null;
+let isLoggedIn = false;
+let userInfo = null;
+let sessionExpires = null;
+let isExpired = false;
+
+try {
+  session = await getSession(Astro.request);
+  
+  // Status-Informationen sammeln
+  isLoggedIn = !!session?.user;
+  userInfo = session?.user || null;
+  sessionExpires = session?.expires ? new Date(session.expires) : null;
+  isExpired = sessionExpires ? sessionExpires < new Date() : false;
+} catch (error) {
+  sessionError = error;
+  console.error('Fehler beim Abrufen der Session:', error);
+}
+
+// Zusätzliche Debug-Informationen
+const debugInfo = {
+  hasSession: !!session,
+  sessionKeys: session ? Object.keys(session) : [],
+  userKeys: userInfo ? Object.keys(userInfo) : [],
+  timestamp: new Date().toISOString(),
+  userAgent: Astro.request.headers.get('user-agent'),
+  cookies: Astro.request.headers.get('cookie') ? 'Vorhanden' : 'Nicht vorhanden'
+};
+---
+
+<Layout title="Login Status - Inventar der Oranienschule">
+  <div class="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-lg">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800 text-center">Login Status</h1>
+    
+    <!-- Fehler-Anzeige -->
+    {sessionError && (
+      <div class="bg-red-50 border border-red-200 p-6 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold mb-4 text-red-800">Fehler beim Abrufen der Session</h2>
+        <div class="bg-red-100 p-4 rounded text-sm font-mono text-red-800 overflow-x-auto">
+          <pre>{JSON.stringify(sessionError, null, 2)}</pre>
+        </div>
+      </div>
+    )}
+    
+    <div class="space-y-6">
+      <!-- Status-Anzeige -->
+      <div class="text-center">
+        <div class={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+          isLoggedIn && !isExpired 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }`}>
+          <span class={`w-3 h-3 rounded-full mr-2 ${
+            isLoggedIn && !isExpired ? 'bg-green-500' : 'bg-red-500'
+          }`}></span>
+          {isLoggedIn && !isExpired ? 'Eingeloggt' : 'Nicht eingeloggt'}
+        </div>
+      </div>
+
+      <!-- Benutzer-Informationen -->
+      {isLoggedIn && userInfo && (
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Benutzer-Informationen</h2>
+          <div class="space-y-3">
+            {userInfo.name && (
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Name:</span>
+                <span class="text-gray-800">{userInfo.name}</span>
+              </div>
+            )}
+            {userInfo.email && (
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">E-Mail:</span>
+                <span class="text-gray-800">{userInfo.email}</span>
+              </div>
+            )}
+            {userInfo.id && (
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Benutzer-ID:</span>
+                <span class="text-gray-800 font-mono text-sm">{userInfo.id}</span>
+              </div>
+            )}
+            {sessionExpires && (
+              <div class="flex justify-between">
+                <span class="font-medium text-gray-600">Session läuft ab:</span>
+                <span class={`text-sm ${isExpired ? 'text-red-600' : 'text-gray-800'}`}>
+                  {sessionExpires.toLocaleString('de-DE')}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <!-- Session-Details -->
+      <div class="bg-blue-50 p-6 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Session-Details</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-600">Session vorhanden:</span>
+            <span class="text-gray-800">{session ? 'Ja' : 'Nein'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-600">Benutzer vorhanden:</span>
+            <span class="text-gray-800">{userInfo ? 'Ja' : 'Nein'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-600">Session abgelaufen:</span>
+            <span class="text-gray-800">{isExpired ? 'Ja' : 'Nein'}</span>
+          </div>
+          {session && (
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-600">Session-Typ:</span>
+              <span class="text-gray-800">{(session as any).strategy || 'Unbekannt'}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Debug-Informationen -->
+      <div class="bg-yellow-50 p-6 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Debug-Informationen</h2>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-600">Zeitstempel:</span>
+            <span class="text-gray-800 text-sm">{debugInfo.timestamp}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-600">Cookies:</span>
+            <span class="text-gray-800">{debugInfo.cookies}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium text-gray-600">Session-Schlüssel:</span>
+            <span class="text-gray-800 text-sm">{debugInfo.sessionKeys.join(', ') || 'Keine'}</span>
+          </div>
+          {userInfo && (
+            <div class="flex justify-between">
+              <span class="font-medium text-gray-600">Benutzer-Schlüssel:</span>
+              <span class="text-gray-800 text-sm">{debugInfo.userKeys.join(', ')}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Rohe Session-Daten (nur im Debug-Modus) -->
+      {session && (
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Rohe Session-Daten</h2>
+          <div class="bg-gray-100 p-4 rounded text-sm font-mono text-gray-800 overflow-x-auto">
+            <pre>{JSON.stringify(session, null, 2)}</pre>
+          </div>
+        </div>
+      )}
+
+      <!-- Aktionen -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        {isLoggedIn && !isExpired ? (
+          <button 
+            id="logout-btn"
+            class="bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            Abmelden
+          </button>
+        ) : (
+          <a 
+            href="/api/auth/signin"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-6 rounded-lg transition-colors text-center no-underline"
+            style="color: white !important; text-decoration: none;"
+          >
+            Anmelden
+          </a>
+        )}
+        <a 
+          href="/"
+          class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-lg transition-colors text-center no-underline"
+          style="color: white !important; text-decoration: none;"
+        >
+          Zurück zur Startseite
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Logout-Funktionalität
+  const logoutButton = document.querySelector("#logout-btn") as HTMLButtonElement;
+  
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+      try {
+        const { signOut } = await import("auth-astro/client");
+        await signOut();
+        // Seite neu laden nach dem Logout
+        window.location.reload();
+      } catch (error) {
+        console.error('Fehler beim Logout:', error);
+        alert('Fehler beim Abmelden: ' + (error as Error).message);
+      }
+    });
+  }
+</script> 

@@ -1,6 +1,18 @@
 ---
 import logo from '../assets/logo.png';
 import { Image } from 'astro:assets';
+import { getSession } from 'auth-astro/server';
+
+// Session abrufen
+let session = null;
+let isLoggedIn = false;
+
+try {
+  session = await getSession(Astro.request);
+  isLoggedIn = !!session?.user;
+} catch (error) {
+  console.error('Fehler beim Abrufen der Session:', error);
+}
 ---
 
 <header class="bg-white py-4 px-4 sm:px-8 shadow-md rounded-lg">
@@ -27,19 +39,42 @@ import { Image } from 'astro:assets';
                 >
                     Kontakt
                 </a>
-                <a 
-                    href="/api/auth/signin" 
-                    class="bg-orange-500 hover:bg-orange-600 text-white !text-white font-medium py-2 px-4 rounded transition-colors inline-block text-center no-underline"
-                    style="color: white !important; text-decoration: none;"
-                >
-                    Login
-                </a>
-                <button 
-                    id="logout" 
-                    class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded transition-colors hidden"
-                >
-                    Logout
-                </button>
+                {!isLoggedIn ? (
+                    <a 
+                        href="/api/auth/signin" 
+                        id="login-btn"
+                        class="bg-orange-500 hover:bg-orange-600 text-white !text-white font-medium py-2 px-4 rounded transition-colors inline-block text-center no-underline"
+                        style="color: white !important; text-decoration: none;"
+                    >
+                        Login
+                    </a>
+                ) : (
+                    <div class="flex items-center gap-3">
+                        <a 
+                            href="/status" 
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors overflow-hidden"
+                            title="Profil anzeigen"
+                        >
+                            {session?.user?.image ? (
+                                <img 
+                                    src={session.user.image} 
+                                    alt="Profilbild" 
+                                    class="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                                </svg>
+                            )}
+                        </a>
+                        <button 
+                            id="logout-btn" 
+                            class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded transition-colors"
+                        >
+                            Logout
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     </div>
@@ -48,7 +83,7 @@ import { Image } from 'astro:assets';
 <script>
     const { signOut } = await import("auth-astro/client")
     
-    const logoutButton = document.querySelector("#logout") as HTMLButtonElement
+    const logoutButton = document.querySelector("#logout-btn") as HTMLButtonElement
     
     // Handle logout button
     if (logoutButton) {
